@@ -19,12 +19,12 @@ module.exports = function (app) {
   
     .get(function (req, res){
       let project = req.params.project;
-      if (!project in projects) {
+      if (!(project in projects)) {
         projects[project] = [];
       }
       let filters = {};
       for (const param in req.query) {
-        if (fields.includes(param)) {
+        if (param in fields) {
           filters[param] = req.query[param];
         }
       };
@@ -61,10 +61,10 @@ module.exports = function (app) {
     })
     
     .put(function (req, res){
-      let success = {"result":"successfully updated", "_id":req.body._id};
-      let failure = {"error":"could not update","_id":req.body._id};
+      let success = {"result": "successfully updated", "_id": req.body["_id"]};
+      let failure = {"error": "could not update", "_id": req.body["_id"]};
       let project = req.params.project;
-      if (!project in projects) {
+      if (!(project in projects)) {
         projects[project] = [];
       }
       let issue = projects[project].find((issue) => issue["_id"] === req.body._id);
@@ -82,10 +82,10 @@ module.exports = function (app) {
     })
     
     .delete(function (req, res){
-      let success = {"result":"successfully deleted", "_id":req.body._id};
-      let failure = {"error":"could not delete","_id":req.body._id};
+      let success = {"result": "successfully deleted", "_id": req.body["_id"]};
+      let failure = {"error":"could not delete","_id":req.body["_id"]};
       let project = req.params.project;
-      if (!project in projects) {
+      if (!(project in projects)) {
         projects[project] = [];
       }
       let issueToDelete = projects[project].find((issue) => issue["_id"] === req.body._id);
