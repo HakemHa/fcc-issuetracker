@@ -12,6 +12,11 @@ const fields = {
   "created_on": "", 
   "updated_on": "", 
 };
+const requiredFields = {
+  "issue_title": "",
+  "issue_text": "",
+  "created_by": "", 
+}
 
 module.exports = function (app) {
 
@@ -40,6 +45,7 @@ module.exports = function (app) {
     })
     
     .post(function (req, res){
+      let badInputResponse = { error: 'required field(s) missing' };
       let project = req.params.project;
       if (!(project in projects)) {
         projects[project] = [];
@@ -50,6 +56,10 @@ module.exports = function (app) {
           ans[field] = req.body[field];
         }
         else {
+          if (field in requiredFields) {
+            res.json(badInputResponse);
+            return;
+          }
           ans[field] = fields[field];
         }
       }
@@ -63,9 +73,19 @@ module.exports = function (app) {
     .put(function (req, res){
       let success = {"result": "successfully updated", "_id": req.body["_id"]};
       let failure = {"error": "could not update", "_id": req.body["_id"]};
+      let noId = { error: 'missing _id' };
+      let noUpdate = { error: 'no update field(s) sent', '_id': req.body["_id"] };
       let project = req.params.project;
       if (!(project in projects)) {
         projects[project] = [];
+      }
+      if (req.body._id === undefined) {
+        res.json(noId);
+        return;
+      }
+      if (Object.keys(req.body).length === 1) {
+        res.json(noUpdate);
+        return;
       }
       let issue = projects[project].find((issue) => issue["_id"] === req.body._id);
       if (issue === undefined) {
@@ -84,9 +104,14 @@ module.exports = function (app) {
     .delete(function (req, res){
       let success = {"result": "successfully deleted", "_id": req.body["_id"]};
       let failure = {"error":"could not delete","_id":req.body["_id"]};
+      let noId = { error: 'missing _id' };
       let project = req.params.project;
       if (!(project in projects)) {
         projects[project] = [];
+      }
+      if (req.body._id === undefined) {
+        res.json(noId);
+        return
       }
       let issueToDelete = projects[project].find((issue) => issue["_id"] === req.body._id);
       if (issueToDelete === undefined) {

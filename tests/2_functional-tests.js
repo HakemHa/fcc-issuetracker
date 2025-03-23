@@ -39,7 +39,7 @@ suite('Functional Tests', function() {
                 done();
             });
     });
-    test('Create an issue with every field', (done) => {
+    test('Create an issue with every field: POST request to /api/issues/{project}', (done) => {
         chai
             .request(server)
             .keepOpen()
@@ -60,7 +60,7 @@ suite('Functional Tests', function() {
                 done();
             });
     });
-    test('Create an issue with only required fields', (done) => {
+    test('Create an issue with only required fields: POST request to /api/issues/{project}', (done) => {
         chai
             .request(server)
             .keepOpen()
@@ -76,6 +76,21 @@ suite('Functional Tests', function() {
                 assert.equal(res.body['created_by'], "3");
                 assert.equal(res.body['assigned_to'], "");
                 assert.equal(res.body['status_text'], "");
+                done();
+            });
+    });
+    test('Create an issue with missing required fields: POST request to /api/issues/{project}', (done) => {
+        chai
+            .request(server)
+            .keepOpen()
+            .post('/api/issues/myproject')
+            .send({
+                "issue_title": "1",
+                "issue_text": "2", 
+            })
+            .end((err, res) => {
+                let badInputResponse = { error: 'required field(s) missing' };
+                assert.deepEqual(res.body, badInputResponse);
                 done();
             });
     });
@@ -112,7 +127,7 @@ suite('Functional Tests', function() {
             "created_by": "33", 
         })
         .end();
-      test('View issues on a project', (done) => {
+      test('View issues on a project: GET request to /api/issues/{project}', (done) => {
         chai
         .request(server)
         .keepOpen()
@@ -123,7 +138,7 @@ suite('Functional Tests', function() {
             done();
         });
       });
-      test('View issues on a project with one filter', (done) => {
+      test('View issues on a project with one filter: GET request to /api/issues/{project}', (done) => {
         chai
         .request(server)
         .keepOpen()
@@ -134,7 +149,7 @@ suite('Functional Tests', function() {
             done();
         });
       });
-      test('View issues on a project with multiple filters', (done) => {
+      test('View issues on a project with multiple filters: GET request to /api/issues/{project}', (done) => {
         chai
         .request(server)
         .keepOpen()
@@ -147,7 +162,7 @@ suite('Functional Tests', function() {
       });
     });
     suite('Update issue on project', () => {
-        test('Update one field on an issue', async () => {
+        test('Update one field on an issue: PUT request to /api/issues/{project}', async () => {
             let idOfTest;
             let connection = chai.request(server).keepOpen();
             await connection
@@ -175,7 +190,7 @@ suite('Functional Tests', function() {
                     assert.equal(res.body[0]["created_by"], "3");
                 });
         });
-        test('Update multiple fields on an issue', async () => {
+        test('Update multiple fields on an issue: PUT request to /api/issues/{project}', async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -209,7 +224,7 @@ suite('Functional Tests', function() {
                     assert.equal(res.body[0]["created_by"], "3");
                 });
         });
-        test('Update an issue with missing _id', async () => {
+        test('Update an issue with missing _id: PUT request to /api/issues/{project}', async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -232,11 +247,11 @@ suite('Functional Tests', function() {
                     "issue_text": "5",
                 })
                 .then((res) => {
-                    let failMessage = { "error": 'could not update' };
+                    let failMessage = { error: 'missing _id' };
                     assert.deepEqual(res.body, failMessage);
                 });
         });
-        test('Update an issue with no fields to update', async () => {
+        test('Update an issue with no fields to update: PUT request to /api/issues/{project}', async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -268,7 +283,7 @@ suite('Functional Tests', function() {
                     assert.equal(res.body[0]["created_by"], "3");
                 });
         });
-        test('Update an issue with incorrect id', async () => {
+        test('Update an issue with an invalid _id: PUT request to /api/issues/{project}', async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -299,7 +314,7 @@ suite('Functional Tests', function() {
     });
 
     suite("Deleting issues", () => {
-        test("Delete an issue", async () => {
+        test("Delete an issue: DELETE request to /api/issues/{project}", async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -325,7 +340,7 @@ suite('Functional Tests', function() {
                     assert.deepEqual(res.body, expected);
                 });
         });
-        test("Delete an issue with an invalid _id", async () => {
+        test("Delete an issue with an invalid _id: DELETE request to /api/issues/{project}", async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -351,7 +366,7 @@ suite('Functional Tests', function() {
                     assert.deepEqual(res.body, expected);
                 });
         });
-        test("Delete an issue with missing _id", async () => {
+        test("Delete an issue with missing _id: DELETE request to /api/issues/{project}", async () => {
             let idOfTest;
             await chai
                 .request(server)
@@ -371,7 +386,7 @@ suite('Functional Tests', function() {
                 .delete('/api/issues/myproject')
                 .send({})
                 .then((res) => {
-                    let expected = {"error":"could not delete"};
+                    let expected = { error: 'missing _id' };
                     assert.deepEqual(res.body, expected);
                 });
         });
